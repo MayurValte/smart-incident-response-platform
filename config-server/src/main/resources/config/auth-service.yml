@@ -1,0 +1,115 @@
+server:
+  port: 8082
+
+
+spring:
+
+  datasource:
+
+    url: jdbc:postgresql://localhost:5432/sirp_auth_db
+
+    username: postgres
+
+    password: root
+
+
+  jpa:
+
+    hibernate:
+      ddl-auto: update
+
+    show-sql: true
+
+    properties:
+
+      hibernate:
+
+        format_sql: true
+
+
+  cloud:
+
+    consul:
+
+      host: localhost
+
+      port: 8500
+
+      discovery:
+
+        service-name: auth-service
+
+        prefer-ip-address: true
+    openfeign:
+      client:
+
+        config:
+
+          default:
+
+            connectTimeout: 3000
+
+            readTimeout: 5000
+
+            loggerLevel: full
+
+
+
+openfeign:
+
+  client:
+
+    config:
+
+      default:
+
+        connectTimeout: 3000
+
+        readTimeout: 5000
+
+
+
+jwt:
+
+  secret:
+
+    12345678901234567890123456789012345678901234567890
+
+  expiration:
+
+    900000
+
+
+  refresh-expiration:
+
+    604800000
+
+
+
+management:
+
+  endpoints:
+
+    web:
+
+      exposure:
+
+        include: "*"
+
+
+  endpoint:
+
+    health:
+
+      show-details: always
+
+
+
+springdoc:
+
+  swagger-ui:
+
+    path:
+
+      /swagger-ui.html
+

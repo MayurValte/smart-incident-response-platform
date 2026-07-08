@@ -1,14 +1,20 @@
 package com.sirp.common.events;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.UUID;
 
 public record IncidentAssignedEvent(
 
-        Long incidentId,
+    UUID eventId,
 
-        Long assigneeId,
+    UUID incidentId,
 
-        LocalDateTime assignedAt
+    UUID assignedTo,
+
+    UUID assignedBy,
+
+    Instant occurredAt
 
 ) {
+
 }

@@ -1,18 +1,26 @@
 package com.sirp.common.events;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.UUID;
 
 public record IncidentCreatedEvent(
 
-        Long incidentId,
+    UUID eventId,
 
-        String title,
+    UUID incidentId,
 
-        String severity,
+    String incidentNumber,
 
-        Long createdBy,
+    String title,
 
-        LocalDateTime createdAt
+    String severity,
+
+    String priority,
+
+    UUID createdBy,
+
+    Instant occurredAt
 
 ) {
+
 }
