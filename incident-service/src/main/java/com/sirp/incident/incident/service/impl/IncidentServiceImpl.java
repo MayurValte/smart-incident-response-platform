@@ -136,8 +136,11 @@ public class IncidentServiceImpl implements IncidentService {
             request.assignedTo()).assignedAt(Instant.now()).build();
         assignmentRepository.save(assignment);
         Incident saved = incidentRepository.save(incident);
-        producer.publishAssigned(new IncidentAssignedEvent(UUID.randomUUID(), incident.getId(), request.assignedTo(),
-                                                           incident.getCreatedBy(), Instant.now()));
+        producer.publishAssigned(new IncidentAssignedEvent(UUID.randomUUID(), incident.getId(),
+                                                           incident.getIncidentNumber(), incident.getTitle(),
+                                                           incident.getPriority(), incident.getSeverity(),
+                                                           request.assignedTo(), incident.getCreatedBy(),
+                                                           Instant.now()));
         return incidentMapper.toResponse(saved);
     }
 
@@ -166,7 +169,9 @@ public class IncidentServiceImpl implements IncidentService {
         }
         slaRepository.save(sla);
         producer.publishResolved(
-            new IncidentResolvedEvent(UUID.randomUUID(), incident.getId(), incident.getCreatedBy(), now));
+            new IncidentResolvedEvent(UUID.randomUUID(), incident.getId(), incident.getIncidentNumber(),
+                                      incident.getTitle(), incident.getPriority(), incident.getSeverity(),
+                                      incident.getCreatedBy(), now));
         return incidentMapper.toResponse(saved);
     }
 
@@ -187,7 +192,9 @@ public class IncidentServiceImpl implements IncidentService {
         incident.setUpdatedAt(Instant.now());
         Incident saved = incidentRepository.save(incident);
         producer.publishClosed(
-            new IncidentClosedEvent(UUID.randomUUID(), incident.getId(), incident.getCreatedBy(), Instant.now()));
+            new IncidentClosedEvent(UUID.randomUUID(), incident.getId(), incident.getIncidentNumber(),
+                                    incident.getTitle(), incident.getPriority(), incident.getSeverity(),
+                                    incident.getCreatedBy(), Instant.now()));
         return incidentMapper.toResponse(saved);
     }
 

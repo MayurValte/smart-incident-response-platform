@@ -53,20 +53,56 @@ public class NotificationEventHandlerImpl implements NotificationEventHandler {
 
     @Override
     public void handleIncidentAssigned(IncidentAssignedEvent event) {
+        IncidentEmailModel model = new IncidentEmailModel(event.incidentNumber(),
+                                                          event.title(),
+                                                          "",
+                                                          event.priority().name(),
+                                                          event.severity().name(),
+                                                          "ACKNOWLEDGED",
+                                                          event.assignedBy().toString(),
+                                                          event.occurredAt(),
+                                                          "http://localhost:8080/api/v1/incidents/" +
+                                                              event.incidentId());
+
+        String html = renderer.renderIncidentAssigned(model);
         createNotifications(event.eventId(), event.incidentId(), event.assignedTo(), NotificationType.INCIDENT_ASSIGNED,
-                            "Incident Assigned", "A new incident has been assigned to you.");
+                            "Incident Assigned", html);
     }
 
     @Override
     public void handleIncidentResolved(IncidentResolvedEvent event) {
+        IncidentEmailModel model = new IncidentEmailModel(event.incidentNumber(),
+                                                          event.title(),
+                                                          "",
+                                                          event.priority().name(),
+                                                          event.severity().name(),
+                                                          "RESOLVED",
+                                                          event.resolvedBy().toString(),
+                                                          event.occurredAt(),
+                                                          "http://localhost:8080/api/v1/incidents/" +
+                                                              event.incidentId());
+
+        String html = renderer.renderIncidentResolved(model);
         createNotifications(event.eventId(), event.incidentId(), event.resolvedBy(), NotificationType.INCIDENT_RESOLVED,
-                            "Incident Resolved", "Incident has been resolved.");
+                            "Incident Resolved", html);
     }
 
     @Override
     public void handleIncidentClosed(IncidentClosedEvent event) {
+        IncidentEmailModel model = new IncidentEmailModel(event.incidentNumber(),
+                                                          event.title(),
+                                                          "",
+                                                          event.priority().name(),
+                                                          event.severity().name(),
+                                                          "CLOSED",
+                                                          event.closedBy().toString(),
+                                                          event.occurredAt(),
+                                                          "http://localhost:8080/api/v1/incidents/" +
+                                                              event.incidentId());
+
+        String html = renderer.renderIncidentClosed(model);
         createNotifications(event.eventId(), event.incidentId(), event.closedBy(), NotificationType.INCIDENT_CLOSED,
-                            "Incident Closed", "Incident has been closed.");
+                            "Incident Closed", html);
     }
 
     private void createNotifications(UUID eventId,
