@@ -1,5 +1,51 @@
 package com.sirp.user.config;
 
+import com.sirp.security.filter.JwtAuthenticationFilter;
+import com.sirp.security.handler.RestAccessDeniedHandler;
+import com.sirp.security.handler.RestAuthenticationEntryPoint;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+/**
+ * Defense-in-depth: re-validates the JWT independently of the Gateway.
+ * /internal/** stays permitAll here (deliberately excluded from
+ * GatewayRouteConfig on the Gateway side) since Feign service-to-service
+ * calls (e.g. auth-service's UserClient) never attach an Authorization
+ * header - only the network boundary keeps that path from being public.
+ */
+@Configuration
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .exceptionHandling(exception -> exception
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/internal/**", "/swagger-ui/**", "/swagger-ui.html",
+                    "/v3/api-docs/**", "/actuator/health")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/users", "/api/v1/teams").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/users/**", "/api/v1/teams/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**", "/api/v1/teams/**").hasRole("ADMIN")
+                .anyRequest().authenticated())
+            .build();
+    }
 }
