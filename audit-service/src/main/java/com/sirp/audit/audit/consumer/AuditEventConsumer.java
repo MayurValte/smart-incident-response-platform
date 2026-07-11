@@ -10,6 +10,7 @@ import com.sirp.common.events.IncidentAssignedEvent;
 import com.sirp.common.events.IncidentClosedEvent;
 import com.sirp.common.events.IncidentCreatedEvent;
 import com.sirp.common.events.IncidentResolvedEvent;
+import com.sirp.common.kafka.KafkaTopics;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class AuditEventConsumer {
   private final AuditEventRepository repository;
   private final ObjectMapper objectMapper;
 
-  @KafkaListener(topics = "incident.created.v1", groupId = "audit-service")
+  @KafkaListener(topics = KafkaTopics.INCIDENT_CREATED, groupId = "audit-service")
   public void consumeCreated(IncidentCreatedEvent event) {
     persist(
         event.eventId(),
@@ -37,7 +38,7 @@ public class AuditEventConsumer {
         "incident-service");
   }
 
-  @KafkaListener(topics = "incident.assigned.v1", groupId = "audit-service")
+  @KafkaListener(topics = KafkaTopics.INCIDENT_ASSIGNED, groupId = "audit-service")
   public void consumeAssigned(IncidentAssignedEvent event) {
     persist(
         event.eventId(),
@@ -49,7 +50,7 @@ public class AuditEventConsumer {
         "incident-service");
   }
 
-  @KafkaListener(topics = "incident.resolved.v1", groupId = "audit-service")
+  @KafkaListener(topics = KafkaTopics.INCIDENT_RESOLVED, groupId = "audit-service")
   public void consumeResolved(IncidentResolvedEvent event) {
     persist(
         event.eventId(),
@@ -61,7 +62,7 @@ public class AuditEventConsumer {
         "incident-service");
   }
 
-  @KafkaListener(topics = "incident.closed.v1", groupId = "audit-service")
+  @KafkaListener(topics = KafkaTopics.INCIDENT_CLOSED, groupId = "audit-service")
   public void consumeClosed(IncidentClosedEvent event) {
     persist(
         event.eventId(),

@@ -10,19 +10,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
-import jakarta.persistence.Version;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.Instant;
 import java.util.UUID;
 
+/**
+ * Immutable by design - an audit trail must never be mutated after the
+ * fact. No setters, no @Version: every field is fixed at creation via the
+ * builder, and the repository only ever inserts new rows, never updates
+ * existing ones.
+ */
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -50,6 +53,4 @@ public class AuditEvent {
     @Lob
     @Column(name = "payload", nullable = false, columnDefinition = "TEXT")
     private String payload;
-    @Version
-    private Long version;
 }
