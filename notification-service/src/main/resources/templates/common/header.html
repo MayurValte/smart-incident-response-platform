@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<th:block th:fragment="header(title,badgeColor,badgeText)">
+
+  <div
+      style="background:#0f172a;color:white;padding:28px;">
+
+    <h1
+        style="margin:0;">
+
+      Smart Incident Response Platform
+
+    </h1>
+
+    <p
+        style="margin-top:8px;color:#cbd5e1;">
+
+      Enterprise Incident Management
+
+    </p>
+
+    <span
+        th:style="'background:'+${badgeColor}+
+';padding:8px 18px;border-radius:18px;font-size:13px;font-weight:bold;'"
+        th:text="${badgeText}">
+
+</span>
+
+  </div>
+
+</th:block>
+
+</html>
