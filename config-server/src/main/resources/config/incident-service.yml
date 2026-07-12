@@ -10,13 +10,19 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      # Flyway now owns the schema - Hibernate only verifies its entity
+      # mappings match what Flyway created, it never alters the schema.
+      ddl-auto: validate
 
     show-sql: true
 
     properties:
       hibernate:
         format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
   kafka:
 

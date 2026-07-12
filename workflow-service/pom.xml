@@ -119,6 +119,18 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- Flyway -->
+
+    <dependency>
+      <artifactId>flyway-core</artifactId>
+      <groupId>org.flywaydb</groupId>
+    </dependency>
+
+    <dependency>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <groupId>org.flywaydb</groupId>
+    </dependency>
+
     <!-- Kafka -->
 
     <dependency>

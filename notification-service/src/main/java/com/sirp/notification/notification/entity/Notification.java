@@ -82,7 +82,7 @@ public class Notification {
     private String subject;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(length = 1000)

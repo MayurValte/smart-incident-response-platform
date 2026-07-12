@@ -17,7 +17,9 @@ spring:
 
     hibernate:
 
-      ddl-auto: update
+      # Flyway now owns the schema - Hibernate only verifies its entity
+      # mappings match what Flyway created, it never alters the schema.
+      ddl-auto: validate
 
     show-sql: true
 
@@ -27,9 +29,14 @@ spring:
 
         format_sql: true
 
+  flyway:
+
+    enabled: true
+    locations: classpath:db/migration
+
   kafka:
 
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:29092
 
     consumer:
 
@@ -50,6 +57,13 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
 
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+      acks: all
+
+      retries: 3
+
+      properties:
+        enable.idempotence: true
 
   cloud:
 

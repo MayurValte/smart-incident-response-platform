@@ -86,6 +86,14 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <artifactId>flyway-core</artifactId>
+      <groupId>org.flywaydb</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <groupId>org.flywaydb</groupId>
+    </dependency>
+    <dependency>
       <artifactId>spring-boot-starter-actuator</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
