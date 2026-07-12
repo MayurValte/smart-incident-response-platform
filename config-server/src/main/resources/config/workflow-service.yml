@@ -73,7 +73,7 @@ management:
 
       exposure:
 
-        include: "*"
+        include: health,info,metrics
 
   endpoint:
 
