@@ -1,4 +1,4 @@
-package com.sirp.incident.config;
+package com.sirp.notification.config;
 
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
@@ -12,10 +12,11 @@ import org.springframework.context.annotation.Configuration;
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, scheme = "bearer", bearerFormat = "JWT")
 public class OpenApiConfig {
 
-  @Bean
-  public OpenAPI openAPI() {
-    return new OpenAPI().info(
-        new Info().title("Incident Service API").version("v1").description("Smart Incident Response Platform"))
-                        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
-  }
+    @Bean
+    public OpenAPI openAPI() {
+        return new OpenAPI().info(
+            new Info().title("Notification Service API").version("v1")
+                      .description("Smart Incident Response Platform"))
+                            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+    }
 }

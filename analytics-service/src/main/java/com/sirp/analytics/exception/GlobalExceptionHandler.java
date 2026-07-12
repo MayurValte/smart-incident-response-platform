@@ -1,5 +1,6 @@
 package com.sirp.analytics.exception;
 
+import com.sirp.common.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
@@ -25,7 +26,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST.value(),
                                                    HttpStatus.BAD_REQUEST.getReasonPhrase(), "Validation failed",
-                                                   request.getRequestURI(), errors);
+                                                   request.getRequestURI(), null, errors);
 
         return ResponseEntity.badRequest().body(response);
     }
@@ -37,7 +38,7 @@ public class GlobalExceptionHandler {
         ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST.value(),
                                                    HttpStatus.BAD_REQUEST.getReasonPhrase(),
                                                    "Invalid value for parameter '" + exception.getName() + "'",
-                                                   request.getRequestURI(), List.of());
+                                                   request.getRequestURI());
 
         return ResponseEntity.badRequest().body(response);
     }
@@ -49,7 +50,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
                                                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                                                   exception.getMessage(), request.getRequestURI(), List.of());
+                                                   exception.getMessage(), request.getRequestURI());
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }

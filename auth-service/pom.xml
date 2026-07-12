@@ -104,6 +104,12 @@
     </dependency>
 
     <dependency>
+      <artifactId>common-library</artifactId>
+      <groupId>com.sirp</groupId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+
+    <dependency>
       <artifactId>postgresql</artifactId>
       <groupId>org.postgresql</groupId>
       <scope>runtime</scope>

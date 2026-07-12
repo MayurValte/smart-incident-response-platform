@@ -1,5 +1,6 @@
 package com.sirp.audit.audit.exception;
 
+import com.sirp.common.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import java.time.Instant;
@@ -25,8 +26,7 @@ public class GlobalExceptionHandler {
         HttpStatus.NOT_FOUND.value(),
         HttpStatus.NOT_FOUND.getReasonPhrase(),
         exception.getMessage(),
-        request.getRequestURI(),
-        List.of());
+        request.getRequestURI());
 
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
   }
@@ -45,6 +45,7 @@ public class GlobalExceptionHandler {
         HttpStatus.BAD_REQUEST.getReasonPhrase(),
         "Validation failed",
         request.getRequestURI(),
+        null,
         errors);
 
     return ResponseEntity.badRequest().body(response);
@@ -64,6 +65,7 @@ public class GlobalExceptionHandler {
         HttpStatus.BAD_REQUEST.getReasonPhrase(),
         "Validation failed",
         request.getRequestURI(),
+        null,
         errors);
 
     return ResponseEntity.badRequest().body(response);
@@ -78,8 +80,7 @@ public class GlobalExceptionHandler {
         HttpStatus.BAD_REQUEST.value(),
         HttpStatus.BAD_REQUEST.getReasonPhrase(),
         exception.getMessage(),
-        request.getRequestURI(),
-        List.of());
+        request.getRequestURI());
 
     return ResponseEntity.badRequest().body(response);
   }
@@ -95,8 +96,7 @@ public class GlobalExceptionHandler {
         HttpStatus.INTERNAL_SERVER_ERROR.value(),
         HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
         exception.getMessage(),
-        request.getRequestURI(),
-        List.of());
+        request.getRequestURI());
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
   }

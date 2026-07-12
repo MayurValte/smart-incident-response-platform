@@ -1,9 +1,12 @@
 package com.sirp.workflow.exception;
 
+import com.sirp.common.dto.ErrorResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
-import java.util.stream.Collectors;
+import java.time.Instant;
+import java.util.List;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ProblemDetail;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,51 +16,58 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(WorkflowNotFoundException.class)
-    public ProblemDetail handleWorkflowNotFound(WorkflowNotFoundException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND,
-                                                                 ex.getMessage());
-        problem.setTitle("Workflow Not Found");
-        return problem;
+    public ResponseEntity<ErrorResponse> handleWorkflowNotFound(WorkflowNotFoundException ex,
+        HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.NOT_FOUND.value(),
+                                                   HttpStatus.NOT_FOUND.getReasonPhrase(), ex.getMessage(),
+                                                   request.getRequestURI(), "WORKFLOW_NOT_FOUND", List.of());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(WorkflowAlreadyExistsException.class)
-    public ProblemDetail handleWorkflowAlreadyExists(WorkflowAlreadyExistsException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT,
-                                                                 ex.getMessage());
-        problem.setTitle("Workflow Already Exists");
-        return problem;
+    public ResponseEntity<ErrorResponse> handleWorkflowAlreadyExists(WorkflowAlreadyExistsException ex,
+        HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.CONFLICT.value(),
+                                                   HttpStatus.CONFLICT.getReasonPhrase(), ex.getMessage(),
+                                                   request.getRequestURI(), "WORKFLOW_ALREADY_EXISTS", List.of());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(InvalidWorkflowStateException.class)
-    public ProblemDetail handleInvalidWorkflowState(InvalidWorkflowStateException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
-                                                                 ex.getMessage());
-        problem.setTitle("Invalid Workflow State");
-        return problem;
+    public ResponseEntity<ErrorResponse> handleInvalidWorkflowState(InvalidWorkflowStateException ex,
+        HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                                                   HttpStatus.BAD_REQUEST.getReasonPhrase(), ex.getMessage(),
+                                                   request.getRequestURI(), "INVALID_WORKFLOW_STATE", List.of());
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
-        String message = ex.getBindingResult().getFieldErrors().stream().map(
-            FieldError::getDefaultMessage).collect(Collectors.joining(", "));
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, message);
-        problem.setTitle("Validation Failed");
-        return problem;
+    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex,
+        HttpServletRequest request) {
+        List<String> errors = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage)
+                                .toList();
+        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                                                   HttpStatus.BAD_REQUEST.getReasonPhrase(), "Validation failed",
+                                                   request.getRequestURI(), "VALIDATION_FAILED", errors);
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST,
-                                                                 ex.getMessage());
-        problem.setTitle("Constraint Violation");
-        return problem;
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException ex,
+        HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.BAD_REQUEST.value(),
+                                                   HttpStatus.BAD_REQUEST.getReasonPhrase(), ex.getMessage(),
+                                                   request.getRequestURI(), "CONSTRAINT_VIOLATION", List.of());
+        return ResponseEntity.badRequest().body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    public ProblemDetail handleException(Exception ex) {
-        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR,
-                                                                 ex.getMessage());
-        problem.setTitle("Internal Server Error");
-        return problem;
+    public ResponseEntity<ErrorResponse> handleException(Exception ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                                   HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                                                   ex.getMessage(), request.getRequestURI(), "INTERNAL_SERVER_ERROR",
+                                                   List.of());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 }

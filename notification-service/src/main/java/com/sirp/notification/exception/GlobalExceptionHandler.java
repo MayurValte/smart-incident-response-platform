@@ -1,10 +1,10 @@
-package com.sirp.user.exception;
+package com.sirp.notification.exception;
 
 import com.sirp.common.dto.ErrorResponse;
-import com.sirp.common.exception.DuplicateResourceException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,39 +13,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handle(ResourceNotFoundException ex, HttpServletRequest request) {
-        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.NOT_FOUND.value(),
-                                                   HttpStatus.NOT_FOUND.getReasonPhrase(), ex.getMessage(),
-                                                   request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handle(UserNotFoundException ex, HttpServletRequest request) {
-        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.NOT_FOUND.value(),
-                                                   HttpStatus.NOT_FOUND.getReasonPhrase(), ex.getMessage(),
-                                                   request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-    }
-
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<ErrorResponse> handleTeamAlreadyExists(DuplicateResourceException ex,
+    @ExceptionHandler(NotificationNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNotFound(NotificationNotFoundException ex,
         HttpServletRequest request) {
-        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.CONFLICT.value(),
-                                                   HttpStatus.CONFLICT.getReasonPhrase(), ex.getMessage(),
+        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.NOT_FOUND.value(),
+                                                   HttpStatus.NOT_FOUND.getReasonPhrase(), ex.getMessage(),
                                                    request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
-
-    @ExceptionHandler(TeamInUseException.class)
-    public ResponseEntity<ErrorResponse> handleTeamInUse(TeamInUseException ex, HttpServletRequest request) {
-        ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.CONFLICT.value(),
-                                                   HttpStatus.CONFLICT.getReasonPhrase(), ex.getMessage(),
-                                                   request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -61,6 +38,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex, HttpServletRequest request) {
+        log.error("Unhandled exception", ex);
         ErrorResponse response = new ErrorResponse(Instant.now(), HttpStatus.INTERNAL_SERVER_ERROR.value(),
                                                    HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
                                                    ex.getMessage(), request.getRequestURI());
