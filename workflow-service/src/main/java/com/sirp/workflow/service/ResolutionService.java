@@ -7,8 +7,8 @@ import java.util.UUID;
 
 public interface ResolutionService {
 
-    WorkflowResponse resolveWorkflow(UUID workflowId, ResolveWorkflowRequest request);
+    WorkflowResponse resolveWorkflow(UUID workflowId, ResolveWorkflowRequest request, UUID actorId);
 
-    WorkflowResponse closeWorkflow(UUID workflowId, CloseWorkflowRequest request);
+    WorkflowResponse closeWorkflow(UUID workflowId, CloseWorkflowRequest request, UUID actorId);
 
 }

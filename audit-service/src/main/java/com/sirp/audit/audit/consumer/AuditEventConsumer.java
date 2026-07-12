@@ -92,7 +92,7 @@ public class AuditEventConsumer {
         event.workflowId(),
         AggregateType.WORKFLOW,
         AuditEventType.WORKFLOW_CREATED,
-        null,
+        event.createdBy(),
         toInstant(event.createdAt()),
         event,
         "workflow-service");
@@ -105,7 +105,7 @@ public class AuditEventConsumer {
         event.workflowId(),
         AggregateType.WORKFLOW,
         AuditEventType.WORKFLOW_ASSIGNED,
-        null,
+        event.assignedBy(),
         toInstant(event.assignedAt()),
         event,
         "workflow-service");
@@ -118,7 +118,7 @@ public class AuditEventConsumer {
         event.workflowId(),
         AggregateType.WORKFLOW,
         AuditEventType.WORKFLOW_ESCALATED,
-        null,
+        event.escalatedBy(),
         toInstant(event.escalatedAt()),
         event,
         "workflow-service");
@@ -144,7 +144,7 @@ public class AuditEventConsumer {
         event.workflowId(),
         AggregateType.WORKFLOW,
         AuditEventType.WORKFLOW_CLOSED,
-        null,
+        event.closedBy(),
         toInstant(event.closedAt()),
         event,
         "workflow-service");

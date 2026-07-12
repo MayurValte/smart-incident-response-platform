@@ -38,7 +38,7 @@ public class ResolutionServiceImpl implements ResolutionService {
     private final IncidentServiceClient incidentServiceClient;
 
     @Override
-    public WorkflowResponse resolveWorkflow(UUID workflowId, ResolveWorkflowRequest request) {
+    public WorkflowResponse resolveWorkflow(UUID workflowId, ResolveWorkflowRequest request, UUID actorId) {
         WorkflowEntity entity = findOrThrow(workflowId);
         if (TERMINAL_STATUSES.contains(entity.getWorkflowStatus())) {
             throw new InvalidWorkflowStateException(
@@ -53,17 +53,16 @@ public class ResolutionServiceImpl implements ResolutionService {
 
         incidentServiceClient.resolveIncident(saved.getIncidentId(), new ResolveIncidentRequest(request.remarks()));
 
-        // The assignee is the closest thing to an "acting user" available here -
-        // workflow-service has no authenticated principal of its own yet.
+        UUID effectiveActor = actorId != null ? actorId : saved.getAssignedTo();
         producer.publishWorkflowResolved(new WorkflowResolvedEvent(UUID.randomUUID(), saved.getId(),
-                                                                    saved.getIncidentId(), saved.getAssignedTo(),
+                                                                    saved.getIncidentId(), effectiveActor,
                                                                     toLocalDateTime(now), request.remarks()));
 
         return mapper.toResponse(saved);
     }
 
     @Override
-    public WorkflowResponse closeWorkflow(UUID workflowId, CloseWorkflowRequest request) {
+    public WorkflowResponse closeWorkflow(UUID workflowId, CloseWorkflowRequest request, UUID actorId) {
         WorkflowEntity entity = findOrThrow(workflowId);
         if (entity.getWorkflowStatus() != WorkflowStatus.RESOLVED) {
             throw new InvalidWorkflowStateException(
@@ -79,8 +78,10 @@ public class ResolutionServiceImpl implements ResolutionService {
 
         incidentServiceClient.closeIncident(saved.getIncidentId());
 
+        UUID effectiveActor = actorId != null ? actorId : saved.getAssignedTo();
         producer.publishWorkflowClosed(
-            new WorkflowClosedEvent(UUID.randomUUID(), saved.getId(), saved.getIncidentId(), toLocalDateTime(now)));
+            new WorkflowClosedEvent(UUID.randomUUID(), saved.getId(), saved.getIncidentId(), effectiveActor,
+                                    toLocalDateTime(now)));
 
         return mapper.toResponse(saved);
     }

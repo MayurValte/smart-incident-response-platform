@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public interface IncidentService {
 
-    IncidentResponse createIncident(CreateIncidentRequest request);
+    IncidentResponse createIncident(CreateIncidentRequest request, UUID actorId);
 
     IncidentResponse getIncident(UUID id);
 
@@ -18,11 +18,17 @@ public interface IncidentService {
 
     IncidentResponse updateIncident(UUID id, UpdateIncidentRequest request);
 
-    IncidentResponse assignIncident(UUID id, AssignIncidentRequest request);
+    /**
+     * actorId is the JWT-verified caller when reached via the public
+     * controller, or null when triggered internally by workflow-service
+     * (Feign calls carry no JWT) - callers should fall back to a sensible
+     * default rather than fabricate an actor.
+     */
+    IncidentResponse assignIncident(UUID id, AssignIncidentRequest request, UUID actorId);
 
-    IncidentResponse resolveIncident(UUID id, ResolveIncidentRequest request);
+    IncidentResponse resolveIncident(UUID id, ResolveIncidentRequest request, UUID actorId);
 
-    IncidentResponse closeIncident(UUID id);
+    IncidentResponse closeIncident(UUID id, UUID actorId);
 
-    IncidentResponse startIncident(UUID id);
+    IncidentResponse startIncident(UUID id, UUID actorId);
 }

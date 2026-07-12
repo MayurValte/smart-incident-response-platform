@@ -7,6 +7,7 @@ import com.sirp.incident.incident.dto.request.UpdateIncidentRequest;
 import com.sirp.incident.incident.dto.response.IncidentPageResponse;
 import com.sirp.incident.incident.dto.response.IncidentResponse;
 import com.sirp.incident.incident.service.IncidentService;
+import com.sirp.security.model.JwtUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,8 +35,10 @@ public class IncidentController {
 
     @Operation(summary = "Create Incident")
     @PostMapping
-    public ResponseEntity<IncidentResponse> createIncident(@RequestBody @Valid CreateIncidentRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(incidentService.createIncident(request));
+    public ResponseEntity<IncidentResponse> createIncident(@RequestBody @Valid CreateIncidentRequest request,
+        @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                             .body(incidentService.createIncident(request, principal.userId()));
     }
 
     @Operation(summary = "Get Incident")
@@ -63,25 +67,27 @@ public class IncidentController {
     @Operation(summary = "Assign Incident")
     @PutMapping("/{id}/assign")
     public ResponseEntity<IncidentResponse> assignIncident(@PathVariable UUID id,
-        @RequestBody @Valid AssignIncidentRequest request) {
-        return ResponseEntity.ok(incidentService.assignIncident(id, request));
+        @RequestBody @Valid AssignIncidentRequest request, @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(incidentService.assignIncident(id, request, principal.userId()));
     }
 
     @Operation(summary = "Resolve Incident")
     @PutMapping("/{id}/resolve")
     public ResponseEntity<IncidentResponse> resolveIncident(@PathVariable UUID id,
-        @RequestBody @Valid ResolveIncidentRequest request) {
-        return ResponseEntity.ok(incidentService.resolveIncident(id, request));
+        @RequestBody @Valid ResolveIncidentRequest request, @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(incidentService.resolveIncident(id, request, principal.userId()));
     }
 
     @Operation(summary = "Close Incident")
     @PutMapping("/{id}/close")
-    public ResponseEntity<IncidentResponse> closeIncident(@PathVariable UUID id) {
-        return ResponseEntity.ok(incidentService.closeIncident(id));
+    public ResponseEntity<IncidentResponse> closeIncident(@PathVariable UUID id,
+        @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(incidentService.closeIncident(id, principal.userId()));
     }
 
     @PutMapping("/{id}/start")
-    public ResponseEntity<IncidentResponse> startIncident(@PathVariable UUID id) {
-        return ResponseEntity.ok(incidentService.startIncident(id));
+    public ResponseEntity<IncidentResponse> startIncident(@PathVariable UUID id,
+        @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(incidentService.startIncident(id, principal.userId()));
     }
 }

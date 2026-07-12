@@ -16,6 +16,8 @@ public record WorkflowCreatedEvent(
 
     UUID assignedTeam,
 
+    UUID createdBy,
+
     IncidentSeverity severity,
 
     Integer escalationLevel,

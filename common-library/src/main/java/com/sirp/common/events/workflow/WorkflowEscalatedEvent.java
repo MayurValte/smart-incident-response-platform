@@ -17,6 +17,8 @@ public record WorkflowEscalatedEvent(
 
     UUID assignedTeam,
 
+    UUID escalatedBy,
+
     LocalDateTime escalatedAt,
 
     String remarks

@@ -10,6 +10,7 @@ import com.sirp.workflow.service.AssignmentService;
 import com.sirp.workflow.service.EscalationService;
 import com.sirp.workflow.service.ResolutionService;
 import com.sirp.workflow.service.WorkflowService;
+import com.sirp.security.model.JwtUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,8 +44,10 @@ public class WorkflowController {
 
     @PostMapping
     @Operation(summary = "Create a workflow for an incident")
-    public ResponseEntity<WorkflowResponse> create(@Valid @RequestBody CreateWorkflowRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(workflowService.createWorkflow(request));
+    public ResponseEntity<WorkflowResponse> create(@Valid @RequestBody CreateWorkflowRequest request,
+        @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                             .body(workflowService.createWorkflow(request, principal.userId()));
     }
 
     @GetMapping("/{id}")
@@ -79,36 +83,36 @@ public class WorkflowController {
     @PutMapping("/{id}/assign")
     @Operation(summary = "Assign a workflow")
     public ResponseEntity<WorkflowResponse> assign(@PathVariable UUID id,
-        @Valid @RequestBody AssignWorkflowRequest request) {
-        return ResponseEntity.ok(assignmentService.assignWorkflow(id, request));
+        @Valid @RequestBody AssignWorkflowRequest request, @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(assignmentService.assignWorkflow(id, request, principal.userId()));
     }
 
     @PutMapping("/{id}/reassign")
     @Operation(summary = "Reassign an already-assigned workflow")
     public ResponseEntity<WorkflowResponse> reassign(@PathVariable UUID id,
-        @Valid @RequestBody AssignWorkflowRequest request) {
-        return ResponseEntity.ok(assignmentService.reassignWorkflow(id, request));
+        @Valid @RequestBody AssignWorkflowRequest request, @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(assignmentService.reassignWorkflow(id, request, principal.userId()));
     }
 
     @PutMapping("/{id}/escalate")
     @Operation(summary = "Escalate a workflow")
     public ResponseEntity<WorkflowResponse> escalate(@PathVariable UUID id,
-        @Valid @RequestBody EscalateWorkflowRequest request) {
-        return ResponseEntity.ok(escalationService.escalateWorkflow(id, request));
+        @Valid @RequestBody EscalateWorkflowRequest request, @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(escalationService.escalateWorkflow(id, request, principal.userId()));
     }
 
     @PutMapping("/{id}/resolve")
     @Operation(summary = "Resolve a workflow")
     public ResponseEntity<WorkflowResponse> resolve(@PathVariable UUID id,
-        @Valid @RequestBody ResolveWorkflowRequest request) {
-        return ResponseEntity.ok(resolutionService.resolveWorkflow(id, request));
+        @Valid @RequestBody ResolveWorkflowRequest request, @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(resolutionService.resolveWorkflow(id, request, principal.userId()));
     }
 
     @PutMapping("/{id}/close")
     @Operation(summary = "Close a resolved workflow")
     public ResponseEntity<WorkflowResponse> close(@PathVariable UUID id,
-        @Valid @RequestBody CloseWorkflowRequest request) {
-        return ResponseEntity.ok(resolutionService.closeWorkflow(id, request));
+        @Valid @RequestBody CloseWorkflowRequest request, @AuthenticationPrincipal JwtUser principal) {
+        return ResponseEntity.ok(resolutionService.closeWorkflow(id, request, principal.userId()));
     }
 
     @DeleteMapping("/{id}")

@@ -60,11 +60,11 @@ public class IncidentServiceImpl implements IncidentService {
     private final AssignmentValidator assignmentValidator;
 
     @Override
-    public IncidentResponse createIncident(CreateIncidentRequest request) {
+    public IncidentResponse createIncident(CreateIncidentRequest request, UUID actorId) {
         Incident incident = incidentMapper.toEntity(request);
         incident.setIncidentNumber(generator.generate());
         incident.setStatus(IncidentStatus.OPEN);
-        incident.setCreatedBy(UUID.fromString("5c7858ad-3bbd-4fbd-8ec0-cfb72ffce8f3"));
+        incident.setCreatedBy(actorId);
         incident.setCreatedAt(Instant.now());
         incident.setUpdatedAt(Instant.now());
         Incident saved = incidentRepository.save(incident);
@@ -118,14 +118,15 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public IncidentResponse assignIncident(UUID id, AssignIncidentRequest request) {
+    public IncidentResponse assignIncident(UUID id, AssignIncidentRequest request, UUID actorId) {
         Incident incident = incidentRepository.findById(id).orElseThrow(() -> new IncidentNotFoundException(id));
         validator.validate(incident.getStatus(), IncidentStatus.ACKNOWLEDGED);
+        UUID effectiveActor = actorId != null ? actorId : incident.getCreatedBy();
         IncidentHistory history = IncidentHistory.builder()
                                                  .incident(incident)
                                                  .oldStatus(incident.getStatus())
                                                  .newStatus(IncidentStatus.ACKNOWLEDGED)
-                                                 .changedBy(incident.getCreatedBy())
+                                                 .changedBy(effectiveActor)
                                                  .changedAt(Instant.now())
                                                  .build();
         historyRepository.save(history);
@@ -139,21 +140,22 @@ public class IncidentServiceImpl implements IncidentService {
         producer.publishAssigned(new IncidentAssignedEvent(UUID.randomUUID(), incident.getId(),
                                                            incident.getIncidentNumber(), incident.getTitle(),
                                                            incident.getPriority(), incident.getSeverity(),
-                                                           request.assignedTo(), incident.getCreatedBy(),
+                                                           request.assignedTo(), effectiveActor,
                                                            Instant.now()));
         return incidentMapper.toResponse(saved);
     }
 
     @Override
-    public IncidentResponse resolveIncident(UUID id, ResolveIncidentRequest request) {
+    public IncidentResponse resolveIncident(UUID id, ResolveIncidentRequest request, UUID actorId) {
         Instant now = Instant.now();
         Incident incident = incidentRepository.findById(id).orElseThrow(() -> new IncidentNotFoundException(id));
         validator.validate(incident.getStatus(), IncidentStatus.RESOLVED);
+        UUID effectiveActor = actorId != null ? actorId : incident.getAssignedTo();
         IncidentHistory history = IncidentHistory.builder()
                                                  .incident(incident)
                                                  .oldStatus(incident.getStatus())
                                                  .newStatus(IncidentStatus.RESOLVED)
-                                                 .changedBy(incident.getAssignedTo())
+                                                 .changedBy(effectiveActor)
                                                  .changedAt(now)
                                                  .build();
         historyRepository.save(history);
@@ -171,19 +173,20 @@ public class IncidentServiceImpl implements IncidentService {
         producer.publishResolved(
             new IncidentResolvedEvent(UUID.randomUUID(), incident.getId(), incident.getIncidentNumber(),
                                       incident.getTitle(), incident.getPriority(), incident.getSeverity(),
-                                      incident.getCreatedBy(), now));
+                                      effectiveActor, now));
         return incidentMapper.toResponse(saved);
     }
 
     @Override
-    public IncidentResponse closeIncident(UUID id) {
+    public IncidentResponse closeIncident(UUID id, UUID actorId) {
         Incident incident = incidentRepository.findById(id).orElseThrow(() -> new IncidentNotFoundException(id));
         validator.validate(incident.getStatus(), IncidentStatus.CLOSED);
+        UUID effectiveActor = actorId != null ? actorId : incident.getAssignedTo();
         IncidentHistory history = IncidentHistory.builder()
                                                  .incident(incident)
                                                  .oldStatus(incident.getStatus())
                                                  .newStatus(IncidentStatus.CLOSED)
-                                                 .changedBy(incident.getAssignedTo())
+                                                 .changedBy(effectiveActor)
                                                  .changedAt(Instant.now())
                                                  .build();
         historyRepository.save(history);
@@ -194,19 +197,20 @@ public class IncidentServiceImpl implements IncidentService {
         producer.publishClosed(
             new IncidentClosedEvent(UUID.randomUUID(), incident.getId(), incident.getIncidentNumber(),
                                     incident.getTitle(), incident.getPriority(), incident.getSeverity(),
-                                    incident.getCreatedBy(), Instant.now()));
+                                    effectiveActor, Instant.now()));
         return incidentMapper.toResponse(saved);
     }
 
     @Override
-    public IncidentResponse startIncident(UUID id) {
+    public IncidentResponse startIncident(UUID id, UUID actorId) {
         Incident incident = incidentRepository.findById(id).orElseThrow(() -> new IncidentNotFoundException(id));
         validator.validate(incident.getStatus(), IncidentStatus.IN_PROGRESS);
+        UUID effectiveActor = actorId != null ? actorId : incident.getAssignedTo();
         IncidentHistory history = IncidentHistory.builder()
                                                  .incident(incident)
                                                  .oldStatus(incident.getStatus())
                                                  .newStatus(IncidentStatus.IN_PROGRESS)
-                                                 .changedBy(incident.getAssignedTo())
+                                                 .changedBy(effectiveActor)
                                                  .changedAt(Instant.now())
                                                  .build();
         historyRepository.save(history);

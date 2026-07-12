@@ -15,6 +15,8 @@ public record WorkflowAssignedEvent(
 
     UUID assignedTeam,
 
+    UUID assignedBy,
+
     LocalDateTime assignedAt
 
 ) {

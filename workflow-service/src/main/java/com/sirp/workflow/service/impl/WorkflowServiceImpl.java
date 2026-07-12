@@ -32,7 +32,7 @@ public class WorkflowServiceImpl implements WorkflowService {
     private final WorkflowEventProducer producer;
 
     @Override
-    public WorkflowResponse createWorkflow(CreateWorkflowRequest request) {
+    public WorkflowResponse createWorkflow(CreateWorkflowRequest request, UUID actorId) {
         if (repository.existsByIncidentId(request.incidentId())) {
             throw new WorkflowAlreadyExistsException(
                 "A workflow already exists for incident " + request.incidentId());
@@ -47,7 +47,7 @@ public class WorkflowServiceImpl implements WorkflowService {
 
         producer.publishWorkflowCreated(new WorkflowCreatedEvent(UUID.randomUUID(), saved.getId(),
                                                                  saved.getIncidentId(), saved.getAssignedTo(),
-                                                                 saved.getAssignedTeam(), saved.getSeverity(),
+                                                                 saved.getAssignedTeam(), actorId, saved.getSeverity(),
                                                                  saved.getEscalationLevel(),
                                                                  toLocalDateTime(saved.getSlaDeadline()),
                                                                  toLocalDateTime(saved.getNextEscalationTime()),

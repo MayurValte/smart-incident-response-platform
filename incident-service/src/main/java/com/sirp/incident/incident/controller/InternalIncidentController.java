@@ -29,22 +29,24 @@ public class InternalIncidentController {
     @PutMapping("/{id}/assign")
     public ResponseEntity<IncidentResponse> assignIncident(@PathVariable UUID id,
         @RequestBody AssignIncidentRequest request) {
-        return ResponseEntity.ok(incidentService.assignIncident(id, request));
+        // No JWT on internal Feign calls - workflow-service is the actual actor here,
+        // but its identity isn't forwarded. The service falls back to a sensible default.
+        return ResponseEntity.ok(incidentService.assignIncident(id, request, null));
     }
 
     @PutMapping("/{id}/start")
     public ResponseEntity<IncidentResponse> startIncident(@PathVariable UUID id) {
-        return ResponseEntity.ok(incidentService.startIncident(id));
+        return ResponseEntity.ok(incidentService.startIncident(id, null));
     }
 
     @PutMapping("/{id}/resolve")
     public ResponseEntity<IncidentResponse> resolveIncident(@PathVariable UUID id,
         @RequestBody ResolveIncidentRequest request) {
-        return ResponseEntity.ok(incidentService.resolveIncident(id, request));
+        return ResponseEntity.ok(incidentService.resolveIncident(id, request, null));
     }
 
     @PutMapping("/{id}/close")
     public ResponseEntity<IncidentResponse> closeIncident(@PathVariable UUID id) {
-        return ResponseEntity.ok(incidentService.closeIncident(id));
+        return ResponseEntity.ok(incidentService.closeIncident(id, null));
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface WorkflowService {
 
-    WorkflowResponse createWorkflow(CreateWorkflowRequest request);
+    WorkflowResponse createWorkflow(CreateWorkflowRequest request, UUID actorId);
 
     WorkflowResponse getWorkflowById(UUID workflowId);
 

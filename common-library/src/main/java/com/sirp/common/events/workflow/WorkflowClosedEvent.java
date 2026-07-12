@@ -11,6 +11,8 @@ public record WorkflowClosedEvent(
 
     UUID incidentId,
 
+    UUID closedBy,
+
     LocalDateTime closedAt
 
 ) {

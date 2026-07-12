@@ -42,7 +42,7 @@ public class EscalationServiceImpl implements EscalationService {
     private final WorkflowEventProducer producer;
 
     @Override
-    public WorkflowResponse escalateWorkflow(UUID workflowId, EscalateWorkflowRequest request) {
+    public WorkflowResponse escalateWorkflow(UUID workflowId, EscalateWorkflowRequest request, UUID actorId) {
         WorkflowEntity entity = repository.findById(workflowId)
                                           .orElseThrow(() -> new WorkflowNotFoundException(
                                               "Workflow not found: " + workflowId));
@@ -58,7 +58,7 @@ public class EscalationServiceImpl implements EscalationService {
         entity.setWorkflowStatus(WorkflowStatus.ESCALATED);
         WorkflowEntity saved = repository.save(entity);
 
-        publishEscalated(saved);
+        publishEscalated(saved, actorId);
 
         return mapper.toResponse(saved);
     }
@@ -78,18 +78,19 @@ public class EscalationServiceImpl implements EscalationService {
                 entity.setWorkflowStatus(WorkflowStatus.ESCALATED);
                 WorkflowEntity saved = repository.save(entity);
 
-                publishEscalated(saved);
+                // No human actor - the scheduler itself triggered this escalation.
+                publishEscalated(saved, null);
                 log.info("Auto-escalated workflow {} to level {}", saved.getId(), saved.getEscalationLevel());
             }
         }
     }
 
-    private void publishEscalated(WorkflowEntity saved) {
+    private void publishEscalated(WorkflowEntity saved, UUID actorId) {
         producer.publishWorkflowEscalated(new WorkflowEscalatedEvent(UUID.randomUUID(), saved.getId(),
                                                                      saved.getIncidentId(),
                                                                      saved.getEscalationLevel(),
                                                                      saved.getAssignedTo(), saved.getAssignedTeam(),
-                                                                     toLocalDateTime(Instant.now()),
+                                                                     actorId, toLocalDateTime(Instant.now()),
                                                                      saved.getRemarks()));
     }
 

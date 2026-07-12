@@ -6,7 +6,7 @@ import java.util.UUID;
 
 public interface EscalationService {
 
-    WorkflowResponse escalateWorkflow(UUID workflowId, EscalateWorkflowRequest request);
+    WorkflowResponse escalateWorkflow(UUID workflowId, EscalateWorkflowRequest request, UUID actorId);
 
     void processScheduledEscalations();
 

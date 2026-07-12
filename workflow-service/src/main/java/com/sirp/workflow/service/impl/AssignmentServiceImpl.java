@@ -36,24 +36,24 @@ public class AssignmentServiceImpl implements AssignmentService {
     private final IncidentServiceClient incidentServiceClient;
 
     @Override
-    public WorkflowResponse assignWorkflow(UUID workflowId, AssignWorkflowRequest request) {
+    public WorkflowResponse assignWorkflow(UUID workflowId, AssignWorkflowRequest request, UUID actorId) {
         WorkflowEntity entity = findOrThrow(workflowId);
         assertNotTerminal(entity);
-        return doAssign(entity, request);
+        return doAssign(entity, request, actorId);
     }
 
     @Override
-    public WorkflowResponse reassignWorkflow(UUID workflowId, AssignWorkflowRequest request) {
+    public WorkflowResponse reassignWorkflow(UUID workflowId, AssignWorkflowRequest request, UUID actorId) {
         WorkflowEntity entity = findOrThrow(workflowId);
         assertNotTerminal(entity);
         if (entity.getAssignedTo() == null) {
             throw new InvalidWorkflowStateException(
                 "Workflow " + workflowId + " has not been assigned yet; use assign instead.");
         }
-        return doAssign(entity, request);
+        return doAssign(entity, request, actorId);
     }
 
-    private WorkflowResponse doAssign(WorkflowEntity entity, AssignWorkflowRequest request) {
+    private WorkflowResponse doAssign(WorkflowEntity entity, AssignWorkflowRequest request, UUID actorId) {
         entity.setAssignedTo(request.assignedTo());
         entity.setAssignedTeam(request.assignedTeam());
         entity.setWorkflowStatus(WorkflowStatus.ASSIGNED);
@@ -64,7 +64,7 @@ public class AssignmentServiceImpl implements AssignmentService {
 
         producer.publishWorkflowAssigned(new WorkflowAssignedEvent(UUID.randomUUID(), saved.getId(),
                                                                     saved.getIncidentId(), saved.getAssignedTo(),
-                                                                    saved.getAssignedTeam(),
+                                                                    saved.getAssignedTeam(), actorId,
                                                                     toLocalDateTime(Instant.now())));
 
         return mapper.toResponse(saved);
