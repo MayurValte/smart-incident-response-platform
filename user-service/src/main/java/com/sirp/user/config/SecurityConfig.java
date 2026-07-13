@@ -32,21 +32,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/internal/**", "/swagger-ui/**", "/swagger-ui.html",
-                    "/v3/api-docs/**", "/actuator/health")
-                .permitAll()
-                .requestMatchers("/actuator/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/v1/users", "/api/v1/teams").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT, "/api/v1/users/**", "/api/v1/teams/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**", "/api/v1/teams/**").hasRole("ADMIN")
-                .anyRequest().authenticated())
-            .build();
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/internal/**", "/swagger-ui/**", "/swagger-ui.html",
+                                "/v3/api-docs/**", "/actuator/health", "/actuator/prometheus")
+                        .permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users", "/api/v1/teams").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**", "/api/v1/teams/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**", "/api/v1/teams/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .build();
     }
 }

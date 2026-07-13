@@ -15,6 +15,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Defense-in-depth: re-validates the JWT independently of the Gateway.
  * No /internal/** exception here - analytics-service has no inbound
  * Feign endpoints, it's populated entirely by Kafka consumers.
+ *
+ * /actuator/prometheus is public (like /actuator/health) rather than
+ * ADMIN-gated with the rest of /actuator/**, because docker-compose's
+ * Prometheus service scrapes it via a plain static target with no way
+ * to attach a JWT (tokens expire in 15 minutes; a static scrape config
+ * can't refresh one). Only prometheus/health are exempted - everything
+ * else under /actuator/** (metrics, circuitbreakers, etc.) still
+ * requires ADMIN.
  */
 @Configuration
 @RequiredArgsConstructor
@@ -34,7 +42,8 @@ public class SecurityConfig {
                 .accessDeniedHandler(accessDeniedHandler))
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/actuator/health")
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/actuator/health",
+                    "/actuator/prometheus")
                 .permitAll()
                 .requestMatchers("/actuator/**").hasRole("ADMIN")
                 .anyRequest().authenticated())

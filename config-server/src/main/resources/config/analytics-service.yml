@@ -98,7 +98,7 @@ management:
 
       exposure:
 
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
 
 springdoc:
 

@@ -77,6 +77,15 @@
 
         <dependency>
 
+            <groupId>io.micrometer</groupId>
+
+            <artifactId>micrometer-registry-prometheus</artifactId>
+
+        </dependency>
+
+
+        <dependency>
+
             <groupId>org.projectlombok</groupId>
 
             <artifactId>lombok</artifactId>

@@ -119,6 +119,27 @@ services:
     restart: unless-stopped
 
 
+  prometheus:
+
+    image: prom/prometheus:latest
+
+    container_name: sirp-prometheus
+
+    ports:
+      - "9090:9090"
+
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+
+    extra_hosts:
+      # host.docker.internal works out of the box on Docker Desktop
+      # (Windows/Mac); this mapping is what makes it resolve on native
+      # Linux Docker Engine too, where all 9 services run on the host.
+      - "host.docker.internal:host-gateway"
+
+    restart: unless-stopped
+
+
 volumes:
 
   postgres_data:

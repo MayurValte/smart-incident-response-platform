@@ -74,6 +74,10 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
+    <dependency>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+      <groupId>io.micrometer</groupId>
+    </dependency>
     <!-- Spring Security (reactive) -->
     <dependency>
       <artifactId>spring-boot-starter-security</artifactId>

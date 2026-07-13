@@ -27,7 +27,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * JwtAuthenticationFilter/CustomAccessDeniedHandler/
  * CustomAuthenticationEntryPoint classes are DELETED - there is now only
  * one implementation of each, used by every service.
- *
+ * <p>
  * CustomUserDetailsService + DaoAuthenticationProvider remain
  * Auth-Service-specific, since only the Auth Service authenticates raw
  * login credentials against the user store.
@@ -62,19 +62,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(exception -> exception
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler))
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/swagger-ui/**",
-                    "/swagger-ui.html", "/v3/api-docs/**", "/actuator/health")
-                .permitAll()
-                .requestMatchers("/actuator/**").hasRole("ADMIN")
-                .anyRequest().authenticated())
-            .build();
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler))
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh", "/swagger-ui/**",
+                                "/swagger-ui.html", "/v3/api-docs/**", "/actuator/health", "/actuator/prometheus")
+                        .permitAll()
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
+                .build();
     }
 }
