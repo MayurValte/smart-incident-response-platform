@@ -152,6 +152,54 @@ services:
     restart: unless-stopped
 
 
+  loki:
+
+    image: grafana/loki:3.0.0
+
+    container_name: sirp-loki
+
+    ports:
+      - "3100:3100"
+
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki_data:/loki
+
+    command: -config.file=/etc/loki/local-config.yaml
+
+    restart: unless-stopped
+
+
+  grafana:
+
+    image: grafana/grafana:latest
+
+    container_name: sirp-grafana
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+
+    environment:
+      # Anonymous admin access, matching this repo's existing local-dev-only
+      # posture for infra (Redis/Kafka also run with no auth) - not for
+      # anything but a laptop.
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+
+    depends_on:
+      - loki
+
+    restart: unless-stopped
+
+
 volumes:
 
   postgres_data:
+
+  loki_data:
+
+  grafana_data:

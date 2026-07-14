@@ -161,6 +161,11 @@
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
+    <dependency>
+      <artifactId>loki-logback-appender</artifactId>
+      <groupId>com.github.loki4j</groupId>
+      <version>1.5.2</version>
+    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
+
+    <!--
+        Pushes directly to Loki over HTTP rather than tailing a log file -
+        all 9 services run on the host via mvnw, Loki runs in Docker, so a
+        file-tailing agent (Promtail) would need the host's log directory
+        volume-mounted into the container. Direct push avoids that.
+        correlationId/traceId are already in MDC (CorrelationIdFilter /
+        Micrometer's Brave bridge) so they ride along on every line for
+        free - see CLAUDE.md's Correlation IDs section.
+    -->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <!--
+            Default batchTimeout is 60000ms - fine for production log
+            volume, useless for local dev where you want to see a log
+            line show up in Grafana within a couple seconds of it being
+            written, not up to a minute later.
+        -->
+        <batchTimeout>2000</batchTimeout>
+        <http>
+            <url>http://localhost:3100/loki/api/v1/push</url>
+        </http>
+        <format>
+            <label>
+                <pattern>app=${appName},level=%level</pattern>
+            </label>
+            <message>
+                <pattern>[%d{ISO8601}] [%thread] %-5level %logger{36} [correlationId=%X{correlationId}] [traceId=%X{traceId}] - %msg%n</pattern>
+            </message>
+            <sortByTime>true</sortByTime>
+        </format>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="LOKI"/>
+    </root>
+
+</configuration>

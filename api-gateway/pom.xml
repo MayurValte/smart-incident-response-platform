@@ -105,6 +105,11 @@
       <groupId>org.projectlombok</groupId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <artifactId>loki-logback-appender</artifactId>
+      <groupId>com.github.loki4j</groupId>
+      <version>1.5.2</version>
+    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
